@@ -99,5 +99,5 @@ print (accuracy)
 #now finally predicting the output for mushroom_test data
 Y_out= xgbpredict.predict(X.ix[5686::,:])
 #Y_out is our required prediction
-
-print(Y_out)
+classes= Y_out
+print(classes)
