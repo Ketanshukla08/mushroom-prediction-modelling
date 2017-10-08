@@ -25,13 +25,13 @@ X=pd.concat(frames, ignore_index= True)
 X.head()
 
 #now converting the string values to numerical values
-for i in X.columns:
-    if i!='radius' and i!='weight':
+for i in df.columns:
+    if i!='radius' and i!='weight' and i!='class':
         X[i]=X[i].astype("category",ordered=True, categories=X[i].unique()).cat.codes
-
+    df[i]=df[i].astype("category",ordered=True, categories=df[i].unique()).cat.codes
 
 #now checking the correlation beetween the sets
-X.corr()
+df.corr()
 
 
 #due to constant value of column veil-type
