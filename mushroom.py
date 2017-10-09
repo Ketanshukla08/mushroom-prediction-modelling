@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+sns.set(style="whitegrid", color_codes=True)
 %matplotlib inline
 
 
@@ -24,10 +25,8 @@ X=pd.concat(frames, ignore_index= True)
 #visualizing the columns and its data tpye
 X.head()
 
-#now converting the string values to numerical values
+#now converting the string values to numerical values of df dataframe
 for i in df.columns:
-    if i!='radius' and i!='weight' and i!='class':
-        X[i]=X[i].astype("category",ordered=True, categories=X[i].unique()).cat.codes
     df[i]=df[i].astype("category",ordered=True, categories=df[i].unique()).cat.codes
 
 #now checking the correlation beetween the sets
@@ -44,33 +43,38 @@ del X['stalk-color-below-ring']
 del X['ring-type']
 del X['habitat']
 
-#due to constant value of column veil-type
+del df['cap-shape']
+del df['cap-color']
+del df['radius']
+del df['weight']
+del df['veil-type']
+del df['stalk-color-above-ring']
+del df['stalk-color-below-ring']
+del df['ring-type']
+del df['habitat']
 
 
-#there are only two continuos value holding features, so lets visualize the distribution of these data
-sns.distplot(X.radius)
-sns.distplot(X.weight)
+#checking the data via stripplot, to get to know the categories of features,
+fig, ax = plt.subplots()
+fig.set_size_inches(17, 10)
+sns.stripplot(data=df)
 
+#now checking the data distribution
+for i in df.columns:
+    sns.distplot(df[i])
+    plt.show()
 
-#we should normalize these features before fitting in our algo
-#normalizing the continuos values only, by creating a separate table for these two features
-X_n=pd.DataFrame(X.ix[:,['radius','weight']])
+#here we can see from distribution plot that gill-attachment, gill-spacing and ring-number features have almost constant value over their columns
+#so we can remove these columns
 
-rank_mean = X_n.stack().groupby(X_n.rank(method='first').stack().astype(int)).mean()
-X_n=X_n.rank(method='min').stack().astype(int).map(rank_mean).unstack()
+del X['gill-spacing']
+del X['gill-attachment']
+del X['ring-number']
 
-
-
-#now amending these values to 'X' set
-X.radius=X_n.ix[:,0]
-X.weight=X_n.ix[:,1]
-
-
-#visualizing the distribution now
-sns.distplot(X.radius)
-sns.distplot(X.weight)
-#distribution is better now
-
+#now making the dummies of categorical features to impliment logistic regression
+#it will give numerical value(1 or 0) coressponding to true or false for each category of every feature
+X=pd.get_dummies(X)
+X.head()
 
 #now spliting the train and test set within the Mushroom_train data we are given
 #here i have splitted manually (for no reason)
@@ -80,32 +84,17 @@ trainY=Y_train.ix[0:4800]
 testX= X.ix[4801:5685,:]
 testY= Y_train.ix[4801:5685]
 
-#now checking the accuracy on logistic regression(for self satisfaction :p)
+#now checking the accuracy on logistic regression
 
 from sklearn.linear_model import LogisticRegression
 LR = LogisticRegression()
 LR=LR.fit(trainX,trainY)
-LR.score(testX,testY)
-#here i got accuracy of 95.5%(increased due to normalization)
+print(LR.score(testX,testY))
 
-#calling xgboost 
-from xgboost import XGBClassifier
-myprediction = XGBClassifier()
-
-#fitting the training data
-myprediction.fit(trainX, trainY)
-
-#now checking the accuracy on testX
-
-Y_pred = myprediction.predict(testX)
-from sklearn.metrics import accuracy_score
-accuracy = accuracy_score(testY, Y_pred)
-print (accuracy)
-#accuracy is 100%(strangely)
-
+#we got accuracy of 100% for this set
 #with this much accuracy, no need to further amend, so final ouput
 #now finally predicting the output for mushroom_test data
-Y_out= myprediction.predict(X.ix[5686::,:])
+Y_out= LR.predict(X.ix[5686::,:])
 #Y_out is our required prediction
-classes= Y_out
+classes= pd.DataFrame(Y_out)
 print(classes)
