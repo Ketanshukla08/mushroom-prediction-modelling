@@ -97,4 +97,4 @@ print(LR.score(testX,testY))
 Y_out= LR.predict(X.ix[5686::,:])
 #Y_out is our required prediction
 classes= pd.DataFrame(Y_out)
-print(classes)
+#print(classes)
