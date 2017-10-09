@@ -33,10 +33,18 @@ for i in df.columns:
 #now checking the correlation beetween the sets
 df.corr()
 
+# HERE WE CAN SEE THAT 'CLASS' DOES NOT DEPEND ON SOME FEATURES EFFECTIVELY, SO WE WOULD REMOVE THOSE FEATURES
+del X['cap-shape']
+del X['cap-color']
+del X['radius']
+del X['weight']
+del X['veil-type']
+del X['stalk-color-above-ring']
+del X['stalk-color-below-ring']
+del X['ring-type']
+del X['habitat']
 
 #due to constant value of column veil-type
-#we are getting NaN in correlation,so removing that input column
-del X['veil-type']
 
 
 #there are only two continuos value holding features, so lets visualize the distribution of these data
